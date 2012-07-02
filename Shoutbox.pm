@@ -12,8 +12,8 @@ our $url = WWW::Mechanize->new();
 $url->get("http://www.forum-invaders.com.br/vb/login.php");
 $url->submit_form(
 	fields => { 
-		vb_login_username => 'acpguedes',
-		vb_login_password => '131010gg',
+		vb_login_username => 'login',
+		vb_login_password => 'password',
 	});
 	
 has 'msg' => (is => 'rw', isa => 'Str');
