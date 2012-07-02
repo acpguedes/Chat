@@ -1,0 +1,1 @@
+Edite o arquivo Shoutbox.pm com seu login e senha.
