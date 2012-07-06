@@ -1,11 +1,11 @@
 package InterfaceSB;
  
 use Tk;  
-use Tk::Label;
-use Tk::DummyEncode;
+use threads;
 use common::sense;
 use Shoutbox;
 
+my $thr;
 my $p = Shoutbox->new();
 
 my $mw = new MainWindow(-background => 'blue');   
@@ -13,6 +13,7 @@ $mw->geometry("600x400");
 $mw->minsize(qw(400 650));  
 $mw->maxsize(qw(800 750));   
 $mw->title("Invaders External ShoutBox");  
+
   
 my $read_locate = $mw -> Frame(-background => 'red', -relief=>'raised',  
   -borderwidth=>1,  
@@ -30,13 +31,15 @@ my $write = $write_locate->Entry (-width=> 70, -background => 'black', -foregrou
 my $button_locate1 = $mw -> Frame(-background => 'red', -relief=>'raised',  
   -borderwidth=>1,) ->place(-x => 280, -y => 350); 
 my $button = $button_locate1->Button( -text => 'Update',
-            -command => \&read_msg)->pack();
+            -command => sub {$thr = threads->create(&read_msg); $thr->join();})->pack();
 
 my $button_locate2 = $mw -> Frame(-background => 'red', -relief=>'raised',  
   -borderwidth=>1,) ->place(-x => 280, -y => 550);	
 my $button2 = $button_locate2->Button( -text => 'send',
-            -command => sub{write_msg($write)})->pack();
-		
+            -command => sub {$thr = threads->create(&write_msg($write)); $thr->join()})->pack();
+
+;
+
 MainLoop;
 			
 sub read_msg{
@@ -52,11 +55,13 @@ sub read_msg{
 			$num++;
 		}
 		elsif($old[$num - 1] ne $msg){
+			
 			$read->insert('end', $msg);
 			$mw->update();
 			push (@old, $msg);
 			$num++;
 		}
+		
 	}
 }
 
@@ -65,6 +70,7 @@ sub write_msg{
 	my $text = $entry->get();
 	$p->msg($text);
 	$p->send_msg;
+	$mw->update();
 }
  
 1;
